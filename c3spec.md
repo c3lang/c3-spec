@@ -1,2 +1,0 @@
-# C3 Specification 
-

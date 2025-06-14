@@ -2,6 +2,27 @@
 
 The things in this spec discussion covers things not in the spec yet.
 
+## Module search order
+
+1. Search in local module section -> done if found
+2. Search in current module -> done if found
+3. Search in all imported modules
+4. If there is only one match -> done
+5. If there are more than one -> ambiguous match
+6. Otherwise it's a failure
+
+### Imported modules
+
+1. All the sub-modules of the current module
+2. All the imported modules and their sub-modules
+3. std::core and all its sub-modules.
+
+## Method search order
+
+1. Search all `@public` methods for the type in all modules.
+2. Search local methods in the current module section.
+3. Search private method in the current module. Or any `@public` imported modules.
+
 ## Operator overloading for binary ops
 
 ### Definitions
@@ -10,6 +31,8 @@ The things in this spec discussion covers things not in the spec yet.
 2. Direct methods: methods defined in the same module as the type
 
 ### Resolution
+
+(Searching follows method lookup)
 
 1. Search all lhs matches iff the lhs type is user-defined, otherwise this is a non-match.
 2. Search all rhs matches iff the rhs type is user-defined, otherwise this is a non-match.
@@ -30,14 +53,5 @@ The things in this spec discussion covers things not in the spec yet.
 6. If more than one normal match is found, this is an ambiguous match.
 7. If one normal match is found, then this is selected over any wildcard match.
 8. If no normal match is found, but multiple wildcard matches, then this is ambiguous.
-
-#### Search domain
-
--- Simplify these rules!
-
-1. Search direct methods, if an ambiguity is found, exit as ambiguous
-2. Search private extensions in current module and-sub modules.
-3. Search `@local` extension in current module.
-
 
 

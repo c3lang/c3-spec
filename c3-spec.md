@@ -250,7 +250,7 @@ vector_type        ::= base-type "[<" length ">]"
 
 #### Vector base type
 
-The base type of a vector must be of boolean, pointer, integer or floating point type.
+The base type of a vector must be of boolean, pointer, enum, integer or floating point type, or a distinct type wrapping one of those types.
 
 #### Min width
 
@@ -284,8 +284,7 @@ Alignment of vectors are platform dependent, but is at least the alignment of it
 
 #### Vector operations
 
-Vectors support the same arithmetics as its underlying type, and will perform the operation
-element-wise.
+Vectors support the same arithmetics and bit operations as its underlying type, and will perform the operation element-wise. Vector operations ignore overloads on the underlying type.
 
 Example:
 
@@ -297,6 +296,12 @@ int[<2>] c = a * b;
 // Equivalent to
 int[<2>] c = { a[0] * b[0], a[1] * b[1] };
 ```
+
+Vectors support `++` and `--` operators, which will be applied to each element. For example, given the `int` vector `int[<2>] x = { 1, 2 }`, the expression `x++` will return the vector `{ 1, 2 }` and update the vector `x` to `{ 2, 3 }`
+
+#### Enum vector "ordinal"
+
+Enum vectors support `.ordinal`, which will return the ordinal of all elements. Note that the `.from_ordinal` method of enums may take a vector and then return an enum vector.
 
 #### Vector limits
 

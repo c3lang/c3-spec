@@ -354,3 +354,61 @@ A void* pointer may never be directly dereferenced or subscripted, it must first
 
 Performing pointer arithmetics on void* will assume that the element size is 1.
 
+### Struct types
+
+A struct may not have zero members.
+
+#### Alignment
+
+A non-packed struct has the alignment of the member that has the highest alignment. A packed struct has alignment 1. See [align attribute](#attributes) for details on changing the alignment.
+
+#### Flexible array member
+
+The last member of a struct may be a flexible array member. This is a placeholder for an unknown length array. A struct must have at least one other member other than the flexible array member.
+
+The syntax of the flexible array member is the same as arrays of inferred length: `Type[*]`. The member will contribute to alignment as if it was a one element array.
+
+#### Struct memory layout and size
+
+The members of a struct is laid out in memory in order of declaration. Each member will be placed at the first offset aligned to the type of the member. This may cause padding to occur between members.
+
+Finally, the end of the struct will be padded so that the size is a multiple of its alignment.
+
+### Union types
+
+A union may not have zero members.
+
+#### Alignment
+
+A union has the alignment of the member that has the highest alignment. See [align attribute](#attributes) for details on changing the alignment.
+
+#### Union size
+
+The size of a union is the size of its largest member, padded so that the size is a multiple of its alignment.
+
+## Expressions
+
+### Assignment expression
+
+```
+assignment_expr    ::= unary_expr assignment_op expr
+assignment_op      ::= "=" | "+=" | "-=" | "*=" | "/=" | "%=" | "<<=" | ">>=" | "&=" | "^=" | "|="
+```
+
+## Statements
+
+```
+stmt                ::= compound_stmt | non_compound_stmt
+non_compound_stmt   ::= assert_stmt | if_stmt | while_stmt | do_stmt | foreach_stmt | foreach_r_stmt
+                       | for_stmt | return_stmt | break_stmt | continue_stmt | var_stmt
+                       | declaration_stmt | defer_stmt | nextcase_stmt | asm_block_stmt
+                       | ct_echo_stmt | ct_error_stmt | ct_assert_stmt | ct_if_stmt | ct_switch_stmt
+                       | ct_for_stmt | ct_foreach_stmt | expr_stmt | ct_assign_stmt
+```
+
+### Compile time assign statements
+
+#### Type assign statement
+
+This assigns a new type to a compile time type variable. The value of the expression is the type assigned.
+

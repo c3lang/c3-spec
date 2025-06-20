@@ -181,23 +181,7 @@ A character literal is enclosed in `'` and may either consist of 1, 2, 4, 8, 16 
 CHARACTER_LIT   ::= "'" (CHAR_LIT_BYTE+) | UNICODE_CHAR "'"
 ```
 
-### Struct types
 
-A struct may not have zero members.
-
-#### Alignment
-
-A non-packed struct has the alignment of the member that has the highest alignment. A packed struct
-has alignment 1. See [align attribute](#attributes) for details on changing the alignment.
-
-### Union types
-
-A union may not have zero members.
-
-#### Alignment
-
-A union has the alignment of the member that has the highest alignment. See [align attribute](#attributes) for
-details on changing the alignment.
 
 ### Fault types
 
@@ -234,19 +218,6 @@ Switching over an `any` value creates an [any switch](#any-switch).
 
 ## Declarations and scope
 
-## Expressions
-
-### Assignment expression
-
-```
-assignment_expr    ::= ct_type_assign | unary_expr assignment_op expr
-ct_type_assign     ::= ct_type_ident "=" type
-assignment_op      ::= "=" | "+=" | "-=" | "*=" | "/=" | "%=" | "<<=" | ">>=" | "&=" | "^=" | "|="
-```
-
-#### Type assign
-
-This assigns a new type to a compile time type variable. The value of the expression is the type assigned.
 
 #### Combined assign
 
@@ -481,16 +452,6 @@ For vaargs, a `bool` or *any integer* smaller than what the C ABI specifies for 
 float smaller than a double is cast to `double`. Compile time floats will be cast to double. Compile time integers will
 be cast to c `int` type.
 
-## Statements
-
-```
-stmt               ::= compound_stmt | non_compound_stmt
-non_compound_stmt  ::= assert_stmt | if_stmt | while_stmt | do_stmt | foreach_stmt | foreach_r_stmt
-                       | for_stmt | return_stmt | break_stmt | continue_stmt | var_stmt
-                       | declaration_stmt | defer_stmt | nextcase_stmt | asm_block_stmt
-                       | ct_echo_stmt | ct_error_stmt | ct_assert_stmt | ct_if_stmt | ct_switch_stmt
-                       | ct_for_stmt | ct_foreach_stmt | expr_stmt
-```
 
 ### Asm block statement
 

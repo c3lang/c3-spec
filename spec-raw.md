@@ -55,3 +55,94 @@ The things in this spec discussion covers things not in the spec yet.
 8. If no normal match is found, but multiple wildcard matches, then this is ambiguous.
 
 
+### Binary expression resolution
+
+Evaluating a binary expression passes through a series of checks and promotions.
+
+Strictly speaking the contracted ternary `?:` and the optional-else operator `??` are binary expressions. However, their evaluation differs from the other binary expressions and so does not follow regular evaluation.
+
+For the remaining binary expressions, an *ambiguous evaluation order check* is performed. Binary expressions are then classified into two groups: 
+
+1. Assignment expressions: `= += -= *= /= %= ^= |= &=`
+2. Non-assignment binary expressions: `+ - * / % ^ | & && || == != < <= > >= &&& ||| +++`.
+
+#### Ambiguous evaluation order check
+
+Three groups of operators are defined:
+
+1. Binary bitwise operators (`& | ^`)
+2. Comparisons (`== != >= <= < >`)
+3. Bitshifts (`<<` and `>>`)
+
+If the left or right hand side in itself is binary expression with the operator in the same group as the expression, then this is an error.
+
+An exception is made for chaining of *the same* operator in group 1.
+
+```c3
+// Valid
+a & b == 3
+a == b << 4
+a & b & c
+// Invalid
+a & b | c
+a == b != c
+a << b << c
+```
+
+### Non-assignment binary expression resolution
+
+#### Evaluation of subexpressions
+1. If the binary expression is not a logical "or" or "and", resolve lhs and rhs as values.
+2. If both lhs and rhs are initializer lists, this is an *error* ⚠️.
+3. If only one side is an initializer list, resolve the other side, then infer the initializer list with the type of the resolved side.
+4. Otherwise, resolve the left hand side.
+5. If the lhs is an enum type, resolve the other side with inferred as an enum.
+6. Otherwise, resolve the rhs as a value.
+
+#### Additional conversions
+
+1. If the operation is `+` and the lhs is a pointer, implicitly cast rhs to usz/isz using *signed implicit binary casting*. If instead the rhs is the pointer, implicitly cast lhs in the same way.
+2. If the operation is `+` and the lhs is a pointer vector, implicitly cast rhs to usz/isz vector using *signed implicit binary casting*. If instead the rhs is the pointer vector, implicitly cast lhs in the same way.
+3. If the operation is `-` and the lhs is a pointer or pointer vector, and the rhs is not a pointer nor pointer vector, implicitly cast to usz/isz using *signed implicit binary casting*.
+
+### Optional else "??"
+
+If the expression is on the form `a ?? b`, the common binary evaluation is skipped in favour of the following:
+
+1. Ternary ambiguity operator check
+2. Check left hand side using top down inference.
+3. If the lhs is not an optional, this is an *error* ⚠️.
+4. Check right hand side using top down inference.
+5. Find the common type of lhs and rhs. If there is no common type, this is an *error* ⚠️.
+6. Try implicitly casting lhs and rhs to the common type, failuer is an *error* ⚠️
+7. The type of the expression is the common type.
+
+##### Ternary operator check
+
+The `??` operator may not have `?:` or `?` on either side:
+
+```c3
+// Valid
+(a ? b : c) ?? d;
+a ?? (d ?: e);
+// Invalid
+a ? b : c ?? d
+a ?? b ? c : d
+a ?? b ?: c
+```
+
+##### Implicit binary casting
+
+1. If the target type is a vector and the value is a scalar, and the value is implicitly castable to the vector element type, expand the value into a vector.
+2. Proceed with regular implicit casting.
+
+##### Signed implicit binary casting
+
+This method of implicit casting takes a pair of signed and unsigned integers or integer vectors types of the same bitwidth and length.
+
+1. If the value is an inline distinct type, flatten to its inline type.
+2. If the value is not an integer / integer vector, this is an *error* ⚠️.
+3. If the value is a signed integer / vector, attempt *implicit binary casting* to the signed type, 
+4. If the value is an unsigned integer / vector, attempt *implicit binary casting* to the unsigned type.
+5. If the cast fails, this an *error* ⚠️.
+

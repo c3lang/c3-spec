@@ -146,3 +146,20 @@ This method of implicit casting takes a pair of signed and unsigned integers or 
 4. If the value is an unsigned integer / vector, attempt *implicit binary casting* to the unsigned type.
 5. If the cast fails, this an *error* ⚠️.
 
+### Typed operator overload resolution
+
+Three types of typed overload matches exist:
+
+1. Exact match: the match is the expected type without conversion, this is the strongest match.
+2. Conversion match: the match is possible after implicit conversion, this is the next strongest match.
+3. Wildcard match: the match is on an untyped parameter, this is the weakest match.
+
+Matches are preferred in order of strength, so exact -> conversion -> wildcard. So for example, an exact match will be preferred over any conversion or wildcard match.
+
+Overloads are searched through all visible methods.
+
+1. Find all possible matches.
+2. Find the match or matches with the highest strength.
+3. If there are more than one match with the highest strength, this is an *error* ⚠️.
+4. If there is only one match, this is the resolved overload.
+

@@ -39,13 +39,13 @@ The carriage return (U+000D) is usually treated as white space, but may be strip
 
 #### Bidirectional markers
 
-Unbalanced bidirectional markers (such as U+202D and U+202E) is not legal.
+Unbalanced bidirectional markers (such as U+202D and U+202E) are not legal.
 
 ### Lexical Translations
 
-A raw byte stream is translated into a sequence of tokens which white space and comments are discarded. The resulting input elements form the tokens that are the terminal symbols of the syntactic grammar.
+A raw byte stream is translated into a sequence of tokens of which white space and comments are discarded. The resulting input elements form the tokens that are the terminal symbols of the syntactic grammar.
 
-The longest possible translation is used at each step, even if the result does not ultimately make a correct program while another lexical translation would.
+The longest possible translation is used at each step, even if the result does not ultimately make a correct program whilst another lexical translation would.
 
 > Example: `a--b` is translated as `a`, `--`, `b`, which does not form a grammatically correct expression, even though the tokenization `a`, `-`, `-`, `b` could form a grammatically correct expression.
 
@@ -53,14 +53,14 @@ The longest possible translation is used at each step, even if the result does n
 
 The C3 compiler divides the sequence of input bytes into lines by recognizing *line terminators*
 
-Lines are terminated by the ASCII LF character (U+000A), also known as "newline". A line termination specifies the termination of the // form of a comment.
+Lines are terminated by the ASCII LF character (U+000A), also known as the "newline". A line termination specifies the termination of the // form of comment.
 
 ### Comments
 
 There are two types of regular comments:
 
-1. `// text` a line comment. The text between `//` and line end is ignored.
-2. `/* text */` block comments. The text between `/*` and `*/` is ignored. It has nesting behaviour, so for every `/*` discovered between the first `/*` and the last `*/` a corresponding `*/` must be found.
+1. `// text` line comments. The text between `//` and line terminator is ignored.
+2. `/* text */` block comments. The text between `/*` and `*/` is ignored. It has nesting behaviour, so for every `/*` discovered between the first `/*` and the last `*/`, a corresponding `*/` must be found.
 
 ### White Space
 
@@ -92,7 +92,7 @@ LC_ALPHANUM_    ::= LC_LETTER_ | DIGIT
 
 Identifiers name program entities such as variables and types. An identifier is a sequence of one or more letters and digits. The first character in an identifier must be a letter or underscore.
 
-C3 has three groups of identifiers: const identifiers - containing only underscore and upper-case letters, type identifiers - starting with an upper case letter followed by at least one underscore letter and regular identifiers, starting with a lower case letter.
+C3 has three groups of identifiers: const identifiers (containing only underscore and upper-case letters), type identifiers (starting with an upper case letter followed by at least one underscore letter) and regular identifiers (starting with a lower case letter).
 
 ```text
 IDENTIFIER       ::= "_"* LC_LETTER ALPHANUM_*
@@ -171,7 +171,7 @@ The following character sequences represent operators and punctuation.
 
 ### Backslash escapes
 
-The following backslash escapes are available for characters and string literals:
+The following backslash escapes are available for character and string literals:
 
 ```text
 \0      0x00 zero value
@@ -186,19 +186,18 @@ The following backslash escapes are available for characters and string literals
 \\      0x5C backslash
 \'      0x27 single quote '
 \"      0x22 double quote "
-\x      Escapes a single byte hex value
-\u      Escapes a two byte unicode hex value
-\U      Escapes a four byte unicode hex value
+\xN     Escapes a single byte hex value
+\uNN    Escapes a two byte unicode hex value
+\UNNNN  Escapes a four byte unicode hex value
 ```
 
 ## Types
 
-Types consist of built-in types and user-defined types (enums, structs, unions, bitstructs and typedef).
+Types consist of built-in types and user-defined types (enums, structs, unions, bitstructs and typedefs).
 
 ### Boolean types
 
-`bool` may have the two values `true` and `false`. It holds a single bit of information but is
-stored in a `char` type.
+`bool` may have the two values `true` and `false`. It holds a single bit of information but is stored in a `char` type.
 
 ### Integer types
 
@@ -242,7 +241,7 @@ float128     IEEE 128-bit*
 
 ### Vector types
 
-A vector lowers to the platform's vector types where available. A vector has a base type and a width.
+A vector lowers to the target platform's vector types where available. A vector has a base type and a width.
 
 ```
 vector_type        ::= base-type "[<" length ">]"
@@ -250,7 +249,7 @@ vector_type        ::= base-type "[<" length ">]"
 
 #### Vector base type
 
-The base type of a vector must be of boolean, pointer, enum, integer or floating point type, or a distinct type wrapping one of those types.
+The base type of a vector must be of a boolean, pointer, enum, integer or floating point type, or a type alias of such.
 
 #### Min width
 
@@ -263,7 +262,7 @@ Vector elements are accessed using `[]`. It is possible to take the address of a
 #### Field access syntax
 
 It is possible to access the index 0-3 with field access syntax. 'x', 'y', 'z', 'w' corresponds to 
-indices 0-3. Alternatively 'r', 'g', 'b', 'a' may be used.
+indices 0-3. Alternatively 'r', 'g', 'b', 'a' may be used but they must not be interchanged simulateously.
 
 #### Swizzling
 
@@ -284,7 +283,7 @@ Alignment of vectors are platform dependent, but is at least the alignment of it
 
 #### Vector operations
 
-Vectors support the same arithmetics and bit operations as its underlying type, and will perform the operation element-wise. Vector operations ignore overloads on the underlying type.
+Vectors support the same arithmetics and bit operations as their underlying type, and will perform the operation per-element. Vector operations ignore overloads on the underlying type.
 
 Example:
 
@@ -313,11 +312,11 @@ An array has the alignment of its elements. An array must have at least one elem
 
 ### Slice types
 
-The slice consist of a pointer, followed by an usz length, having the alignment of pointers.
+The slice consists of a pointer, followed by an `usz` length, and has the alignment of a pointer.
 
 ### Pointer types
 
-A pointer an address to memory.
+A pointer is an address to memory.
 
 ```text
 pointer_type       ::= type "*"
@@ -360,7 +359,7 @@ A struct may not have zero members.
 
 #### Alignment
 
-A non-packed struct has the alignment of the member that has the highest alignment. A packed struct has alignment 1. See [align attribute](#attributes) for details on changing the alignment.
+A non-packed struct has the alignment of the member that has the highest alignment. A packed struct has alignment 1. See the [@align attribute](#attributes) for details on changing the alignment.
 
 #### Flexible array member
 
@@ -372,7 +371,7 @@ The syntax of the flexible array member is the same as arrays of inferred length
 
 The members of a struct is laid out in memory in order of declaration. Each member will be placed at the first offset aligned to the type of the member. This may cause padding to occur between members.
 
-Finally, the end of the struct will be padded so that the size is a multiple of its alignment.
+Finally, the end of the struct will be padded so that its size is a multiple of its alignment.
 
 ### Union types
 
@@ -380,11 +379,11 @@ A union may not have zero members.
 
 #### Alignment
 
-A union has the alignment of the member that has the highest alignment. See [align attribute](#attributes) for details on changing the alignment.
+A union has the alignment of the member that has the highest alignment. See the [@align attribute](#attributes) for details on changing the alignment.
 
 #### Union size
 
-The size of a union is the size of its largest member, padded so that the size is a multiple of its alignment.
+The size of a union is the size of its largest member, padded so that its size is a multiple of its alignment.
 
 ## Expressions
 
